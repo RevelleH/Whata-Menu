@@ -1,3 +1,4 @@
+
 class MenuItem:
     def __init__(self, name, price):
         self.name = name
@@ -179,19 +180,78 @@ class WhataburgerMenu:
             for shake in self.shakes:
                 print(shake)
 
+class Meal:
+    def __init__(self, meal_id, name, price, description):
+        self.meal_id = meal_id
+        self.name = name
+        self.price = price
+        self.description = description
+
+    def __str__(self):
+        return f"{self.name} - ${self.price:.2f}: {self.description}"
+
+
+class Burger:
+    def __init__(self, name, price, patty_count=1):
+        self.name = name
+        self.price = price
+        self.patty_count = patty_count
+
+    def __str__(self):
+        return f"{self.name} - ${self.price:.2f} ({self.patty_count} patty{'s' if self.patty_count > 1 else ''})"
+
+
+class Side:
+    def __init__(self, name, price, calories):
+        self.name = name
+        self.price = price
+        self.calories = calories
+
+    def __str__(self):
+        return f"{self.name} - ${self.price:.2f} ({self.calories} cal)"
+
+
+class Dessert:
+    def __init__(self, name, price, calories):
+        self.name = name
+        self.price = price
+        self.calories = calories
+
+    def __str__(self):
+        return f"{self.name} - ${self.price:.2f} ({self.calories} cal)"
+
+
+class Salad:
+    def __init__(self, name, price, calories):
+        self.name = name
+        self.price = price
+        self.calories = calories
+
+    def __str__(self):
+        return f"{self.name} - ${self.price:.2f} ({self.calories} cal)"
+
+
+class Shake:
+    def __init__(self, name, price, calories):
+        self.name = name
+        self.price = price
+        self.calories = calories
+
+    def __str__(self):
+        return f"{self.name} - ${self.price:.2f} ({self.calories} cal)"
+
+
 class Order:
     def __init__(self):
         self.items = []
         self.total = 0.0
 
     def add_item(self, item):
-        """Add an item to the order."""
         self.items.append(item)
         self.total += item.price
         print(f"{item.name} added to your order!")
 
     def remove_item(self, item_name):
-        """Remove an item from the order by name."""
         for item in self.items:
             if item.name.lower() == item_name.lower():
                 self.items.remove(item)
@@ -201,7 +261,6 @@ class Order:
         print(f"Item '{item_name}' not found in your order.")
 
     def view_order(self):
-        """View the current order."""
         if not self.items:
             print("Your order is empty!")
         else:
@@ -212,45 +271,14 @@ class Order:
             print("=========================")
 
     def clear_order(self):
-        """Clear the entire order."""
         self.items = []
         self.total = 0.0
         print("Your order has been cleared!")
 
-    def save_order(self, filename="order.txt"):
-        """Save the current order to a file."""
-        try:
-            with open(filename, "w") as file:
-                for item in self.items:
-                    file.write(f"{item.name},{item.price}\n")
-                file.write(f"Total,{self.total}\n")
-            print(f"Order saved to {filename}.")
-        except Exception as e:
-            print(f"Error saving order: {e}")
-
-    def load_order(self, filename="order.txt"):
-        """Load a previously saved order from a file."""
-        try:
-            with open(filename, "r") as file:
-                self.clear_order()
-                for line in file:
-                    name, price = line.strip().split(",")
-                    if name == "Total":
-                        self.total = float(price)
-                    else:
-                        self.items.append(MenuItem(name, float(price)))
-            print(f"Order loaded from {filename}.")
-        except Exception as e:
-            print(f"Error loading order: {e}")
-
     def apply_discount(self, discount_percentage):
-        """Apply a percentage discount to the total order."""
         discount = self.total * (discount_percentage / 100)
         self.total -= discount
         print(f"A discount of {discount_percentage}% has been applied. You saved ${discount:.2f}!")
-
-menu = WhataburgerMenu()
-menu.display_menu()
 
 
 def display_main_menu():
@@ -258,20 +286,74 @@ def display_main_menu():
     print("1. View Full Menu")
     print("2. Add an Item to Your Order")
     print("3. Remove an Item from Your Order")
-    print("4. Replace an Item in Your Order")
-    print("5. Customize an Item in Your Order")
-    print("6. View Your Current Order")
-    print("7. Clear Your Order")
-    print("8. Save Your Order")
-    print("9. Load a Previous Order")
-    print("10. Apply a Discount")
-    print("11. Exit")
+    print("4. View Your Current Order")
+    print("5. Clear Your Order")
+    print("6. Apply a Discount")
+    print("7. Exit")
     print("========================================")
 
+def main():
+    menu = WhataburgerMenu()
+    order = Order()
 
-display_main_menu()
+    while True:
+        display_main_menu()
+        choice = input("Please select an option: ")
 
+        if choice == "1":
+            # View Full Menu
+            menu.display_menu()
 
+        elif choice == "2":
+            # Add an Item to Order
+            print("\n===== Add an Item to Your Order =====")
+            menu.display_menu()
+            item_name = input("Enter the name of the item to add: ")
+            found = False
+            for category in [menu.meals, menu.burgers, menu.sides, menu.desserts, menu.salads, menu.shakes]:
+                for item in category:
+                    if item.name.lower() == item_name.lower():
+                        order.add_item(item)
+                        found = True
+                        break
+                if found:
+                    break
+            if not found:
+                print(f"Item '{item_name}' not found in the menu.")
+
+        elif choice == "3":
+            # Remove an Item from Order
+            item_name = input("Enter the name of the item to remove: ")
+            order.remove_item(item_name)
+
+        elif choice == "4":
+            # View Current Order
+            order.view_order()
+
+        elif choice == "5":
+            # Clear Order
+            order.clear_order()
+
+        elif choice == "6":
+            # Apply a Discount
+            try:
+                discount = float(input("Enter discount percentage (0-100): "))
+                if 0 <= discount <= 100:
+                    order.apply_discount(discount)
+                else:
+                    print("Please enter a valid percentage between 0 and 100.")
+            except ValueError:
+                print("Invalid input. Please enter a numerical value.")
+
+        elif choice == "7":
+            # Exit
+            print("Thank you for using the Whataburger Ordering System. Goodbye!")
+            break
+
+        else:
+            print("Invalid choice. Please try again.")
+
+main()
 
 
 
